@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { auth } from '../../services/firebaseConnection';
-import { createUserWithEmailAndPassword, updateProfile, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { AuthContext } from '../../contexts/AuthContext';
 
 import toast from 'react-hot-toast';
