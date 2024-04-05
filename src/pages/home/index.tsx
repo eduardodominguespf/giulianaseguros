@@ -14,13 +14,13 @@ interface CarProps {
   city: string;
   km: string;
   images: CarImageProps[];
-};
+}
 
 interface CarImageProps {
   name: string;
   uid: string;
   url: string;
-};
+}
 
 interface UserProps {
   uid: string;
@@ -31,14 +31,20 @@ export function Home() {
   const [cars, setCars] = useState<CarProps[]>([]);
   const [loadImages, setLoadImages] = useState<string[]>([]);
   const [input, setInput] = useState("");
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { user } = useContext(AuthContext) as { user: UserProps };
 
   useEffect(() => {
-    loadCars();
-  }, []);
+    setIsLoggedIn(!!user); // Definir isLoggedIn como true se o usuário estiver logado
+  }, [user]);
 
-  function loadCars() {
+  useEffect(() => {
+    if (!isLoggedIn) {
+      loadAllCars(); // Carregar todos os carros se o usuário não estiver logado
+    }
+  }, [isLoggedIn]);
+
+  function loadAllCars() {
     const carsRef = collection(db, "cars");
     const queryRef = query(carsRef, orderBy("created", "desc"));
 
@@ -69,7 +75,9 @@ export function Home() {
 
   async function handleSearchCar() {
     if (input === '') {
-      loadCars();
+      if (!isLoggedIn) {
+        loadAllCars();
+      }
       return;
     }
     setCars([]);
@@ -99,8 +107,8 @@ export function Home() {
     setCars(listCars);
   };
 
-  // Render only the cars that the user is allowed to see
-  const carsToRender = user?.role === 'administrador' ? cars : cars.filter(car => car.uid === user?.uid);
+  // Render only the cars that the user is allowed to see if logged in
+  const carsToRender = isLoggedIn && user?.role !== 'administrador' ? cars.filter(car => car.uid === user?.uid) : cars;
 
   return (
     <Container>
