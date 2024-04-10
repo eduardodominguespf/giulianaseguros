@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
 import logoImg from '../../assets/logo.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container } from '../../components/container';
@@ -7,7 +7,8 @@ import { Input } from '../../components/input';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { AuthContext } from '../../contexts/AuthContext';
 import { auth } from '../../services/firebaseConnection';
 
 import toast from 'react-hot-toast';
@@ -20,6 +21,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export function Login(){
+    const { handleInfoUser } = useContext(AuthContext);
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors} } = useForm<FormData>({
         resolver: zodResolver(schema),
@@ -27,18 +29,20 @@ export function Login(){
     });
 
     useEffect(() => {
-        async function handleLogout() {
-            await signOut(auth)
-        }
-
-        handleLogout();
+        // handleLogout(); // Remove this line
     }, []);
 
-    function onSubmit(data: FormData){
+    async function onSubmit(data: FormData){
         signInWithEmailAndPassword(auth, data.email, data.password)
-        .then((user) => {
+        .then((userCredential) => {
+            const user = userCredential.user;
+            handleInfoUser({
+                name: user.displayName,
+                email: user.email,
+                uid: user.uid,
+                role: null // Defina o papel do usuário conforme necessário após o login
+            });
             console.log("LOGADO COM SUCESSO!")
-            console.log(user)
             toast.success("Logado com sucesso!")
             navigate("/dashboard", { replace: true })
         })

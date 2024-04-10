@@ -49,7 +49,7 @@ export function Home() {
     const queryRef = query(carsRef, orderBy("created", "desc"));
 
     getDocs(queryRef)
-      .then((snapshot) => {
+     .then((snapshot) => {
         let listCars = [] as CarProps[];
 
         snapshot.forEach(doc => {
@@ -107,8 +107,8 @@ export function Home() {
     setCars(listCars);
   };
 
-  // Render only the cars that the user is allowed to see if logged in
-  const carsToRender = isLoggedIn && user?.role !== 'administrador' ? cars.filter(car => car.uid === user?.uid) : cars;
+  // Renderizar apenas os carros que o usuário tem permissão para ver se estiver logado
+  const carsToRender = isLoggedIn? (user?.role === `administrador`? cars : cars.filter(car => car.uid === user?.uid)) : cars;
 
   return (
     <Container>
