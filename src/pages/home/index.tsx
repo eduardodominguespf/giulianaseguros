@@ -35,7 +35,7 @@ export function Home() {
     getDocs(carsRef)
       .then((snapshot) => {
         let listCars = [] as CarProps[];
-
+  
         snapshot.forEach((doc) => {
           listCars.push({
             id: doc.id,
@@ -48,10 +48,14 @@ export function Home() {
             uid: doc.data().uid
           });
         });
-
+  
         setCars(listCars);
+      })
+      .catch((error) => {
+        console.error("Error fetching cars: ", error);
       });
-  };
+  }
+  
 
   function handleSearchCar() {
     console.log("Search button clicked!");
