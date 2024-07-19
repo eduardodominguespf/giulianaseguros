@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container } from '../../components/container';
 import { Link } from 'react-router-dom';
-import { collection, query, getDocs, orderBy, where } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../services/firebaseConnection';
 
 interface CarProps {
@@ -27,24 +27,16 @@ export function Home() {
   const [input, setInput] = useState("");
 
   useEffect(() => {
-    loadAllCars(); // Carregar todos os carros quando o componente for montado
+    loadAllCars();
   }, []);
-
-  useEffect(() => {
-    if (input === '') {
-      loadAllCars();
-    }
-  }, [input]);
 
   function loadAllCars() {
     const carsRef = collection(db, "cars");
-    const queryRef = query(carsRef, orderBy("created", "desc"));
-
-    getDocs(queryRef)
+    getDocs(carsRef)
       .then((snapshot) => {
         let listCars = [] as CarProps[];
 
-        snapshot.forEach(doc => {
+        snapshot.forEach((doc) => {
           listCars.push({
             id: doc.id,
             name: doc.data().name,
@@ -59,41 +51,14 @@ export function Home() {
 
         setCars(listCars);
       });
+  };
+
+  function handleSearchCar() {
+    console.log("Search button clicked!");
   }
 
   function handleImageLoad(id: string) {
-    setLoadImages((prevImageLoaded) => [...prevImageLoaded, id]);
-  }
-
-  async function handleSearchCar() {
-    if (input === '') {
-      loadAllCars();
-      return;
-    }
-    setLoadImages([]);
-
-    const q = query(collection(db, "cars"),
-      where("name", ">=", input.toUpperCase()),
-      where("name", "<=", input.toUpperCase() + "\uf8ff")
-    );
-    const querySnapshot = await getDocs(q);
-
-    let listCars = [] as CarProps[];
-
-    querySnapshot.forEach((doc) => {
-      listCars.push({
-        id: doc.id,
-        name: doc.data().name,
-        year: doc.data().year,
-        km: doc.data().km,
-        city: doc.data().city,
-        price: doc.data().price,
-        images: doc.data().images,
-        uid: doc.data().uid
-      });
-    });
-
-    setCars(listCars);
+    setLoadImages((prevImages) => [...prevImages, id]);
   }
 
   return (
