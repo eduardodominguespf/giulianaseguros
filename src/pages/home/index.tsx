@@ -77,7 +77,6 @@ export function Home() {
       loadAllCars();
       return;
     }
-    setCars([]);
     setLoadImages([]);
 
     const q = query(collection(db, "cars"),
@@ -104,7 +103,7 @@ export function Home() {
     setCars(listCars);
   }
 
-  const carsToRender = user?.role === 'Administrador' ? cars : cars.filter(car => car.uid === user?.uid);
+  const carsToRender = cars; // Exibir todos os carros independentemente do estado de login
 
   return (
     <Container>
