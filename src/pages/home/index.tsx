@@ -23,6 +23,7 @@ interface CarImageProps {
 
 export function Home() {
   const [cars, setCars] = useState<CarProps[]>([]);
+  const [filteredCars, setFilteredCars] = useState<CarProps[]>([]);
   const [loadImages, setLoadImages] = useState<string[]>([]);
   const [input, setInput] = useState("");
 
@@ -35,7 +36,7 @@ export function Home() {
     getDocs(carsRef)
       .then((snapshot) => {
         let listCars = [] as CarProps[];
-  
+
         snapshot.forEach((doc) => {
           listCars.push({
             id: doc.id,
@@ -48,18 +49,26 @@ export function Home() {
             uid: doc.data().uid
           });
         });
-  
+
         setCars(listCars);
+        setFilteredCars(listCars); // Inicialmente, todos os carros são filtrados
       })
       .catch((error) => {
         console.error("Error fetching cars: ", error);
       });
   }
-  
 
   function handleSearchCar() {
-    console.log("Search button clicked!");
+    const searchTerm = input.toLowerCase();
+    const filtered = cars.filter(car => 
+      car.name.toLowerCase().includes(searchTerm)
+    );
+    setFilteredCars(filtered);
   }
+
+  useEffect(() => {
+    handleSearchCar();
+  }, [input]);
 
   function handleImageLoad(id: string) {
     setLoadImages((prevImages) => [...prevImages, id]);
@@ -85,7 +94,7 @@ export function Home() {
       <h1 className="font-bold text-center mt-6 text 2xl mb-4">Carros novos e usados em todo o Brasil!</h1>
 
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {cars.map(car => (
+        {filteredCars.map(car => (
           <Link key={car.id} to={`/car/${car.id}`}>
             <section className="w-full bg-white rounded-lg">
               <div
