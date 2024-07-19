@@ -34,22 +34,22 @@ function AuthProvider({ children }: AuthProviderProps){
                     uid: user.uid,
                     name: user?.displayName,
                     email: user?.email,
-                    role: null
+                    role: null // Aqui você precisa obter e definir corretamente a propriedade role
                 })
-
+    
                 setLoadingAuth(false)
-
+    
             }else{
                 // Não tem user logado...
                 setUser(null);
                 setLoadingAuth(false);
             }
         });
-
+    
         return () => {
             unsub();
         }
-
+    
     }, []);
 
     function handleInfoUser({name, email, uid, role}: UserProps){

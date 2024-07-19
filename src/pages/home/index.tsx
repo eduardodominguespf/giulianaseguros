@@ -107,8 +107,8 @@ export function Home() {
     setCars(listCars);
   };
 
-  // Renderizar apenas os carros que o usuário tem permissão para ver se estiver logado
-  const carsToRender = isLoggedIn? (user?.role === `administrador`? cars : cars.filter(car => car.uid === user?.uid)) : cars;
+ // Corrija a linha onde você compara a 'role' com 'administrador'
+const carsToRender = isLoggedIn ? (user?.role === 'Administrador' ? cars : cars.filter(car => car.uid === user?.uid)) : cars;
 
   return (
     <Container>

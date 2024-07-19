@@ -52,30 +52,30 @@ export function Register() {
     }, []);
 
     async function onSubmit(data: FormData) {
-        createUserWithEmailAndPassword(auth, data.email, data.password)
-        .then(async (user) => {
-            await updateProfile(user.user, {
-                displayName: data.name
-            });
-
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+            await updateProfile(userCredential.user, { displayName: data.name });
+    
+            // Adicione aqui a lógica para salvar a propriedade 'role' no banco de dados
+            // Por exemplo, você pode salvar a 'role' no documento do usuário
+            // Isso deve ser feito apenas após o usuário ser criado com sucesso
+    
             handleInfoUser({
                 name: data.name,
                 email: data.email,
-                uid: user.user.uid,
-                role: data.role // Usando diretamente a propriedade data.role
+                uid: userCredential.user.uid,
+                role: data.role
             });
-
+    
             console.log("CADASTRADO COM SUCESSO!");
             toast.success("Cadastrado com sucesso!");
             navigate("/dashboard", { replace: true });
-
-        })
-        .catch((error) => {
+    
+        } catch (error) {
             console.log("ERRO AO CADASTRAR ESTE USUÁRIO!");
             toast.error("Erro ao efetuar cadastro!");
-            console.log(error);
-        });
-
+            console.error(error);
+        }
     }
 
     function fetchCarsFromDatabase(): Promise<Car[]> {
