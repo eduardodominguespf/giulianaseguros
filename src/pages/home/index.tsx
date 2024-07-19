@@ -31,25 +31,24 @@ export function Home() {
   const [cars, setCars] = useState<CarProps[]>([]);
   const [loadImages, setLoadImages] = useState<string[]>([]);
   const [input, setInput] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { user } = useContext(AuthContext) as { user: UserProps };
 
   useEffect(() => {
-    setIsLoggedIn(!!user); // Definir isLoggedIn como true se o usuário estiver logado
-  }, [user]);
+    loadAllCars(); // Carregar todos os carros quando o componente for montado
+  }, []);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      loadAllCars(); // Carregar todos os carros se o usuário não estiver logado
+    if (input === '') {
+      loadAllCars();
     }
-  }, [isLoggedIn]);
+  }, [input]);
 
   function loadAllCars() {
     const carsRef = collection(db, "cars");
     const queryRef = query(carsRef, orderBy("created", "desc"));
 
     getDocs(queryRef)
-     .then((snapshot) => {
+      .then((snapshot) => {
         let listCars = [] as CarProps[];
 
         snapshot.forEach(doc => {
@@ -67,17 +66,15 @@ export function Home() {
 
         setCars(listCars);
       });
-  };
+  }
 
   function handleImageLoad(id: string) {
     setLoadImages((prevImageLoaded) => [...prevImageLoaded, id])
-  };
+  }
 
   async function handleSearchCar() {
     if (input === '') {
-      if (!isLoggedIn) {
-        loadAllCars();
-      }
+      loadAllCars();
       return;
     }
     setCars([]);
@@ -105,10 +102,9 @@ export function Home() {
     })
 
     setCars(listCars);
-  };
+  }
 
- // Corrija a linha onde você compara a 'role' com 'administrador'
-const carsToRender = isLoggedIn ? (user?.role === 'Administrador' ? cars : cars.filter(car => car.uid === user?.uid)) : cars;
+  const carsToRender = user?.role === 'Administrador' ? cars : cars.filter(car => car.uid === user?.uid);
 
   return (
     <Container>
